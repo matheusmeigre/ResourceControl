@@ -119,11 +119,11 @@ export default function UsersClient({ users: initial, roles, currentUserId }: Pr
           placeholder="Buscar usuário..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={openCreate}
-          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg"
+          className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
           Novo Usuário
@@ -131,49 +131,49 @@ export default function UsersClient({ users: initial, roles, currentUserId }: Pr
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="grid grid-cols-[2fr_3fr_1fr_1fr_auto] px-5 py-3 bg-gray-50 border-b border-gray-100 gap-4">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Nome</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">E-mail</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Perfil</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</span>
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Ações</span>
+      <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-xl overflow-hidden">
+        <div className="grid grid-cols-[2fr_3fr_1fr_1fr_auto] px-5 py-3 bg-gray-50/80 dark:bg-slate-800/50 border-b border-gray-100 dark:border-slate-800 gap-4">
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Nome</span>
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">E-mail</span>
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Perfil</span>
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</span>
+          <span className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Ações</span>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-50 dark:divide-slate-800">
           {filtered.length === 0 && (
-            <div className="px-5 py-12 text-center text-sm text-gray-400">
+            <div className="px-5 py-12 text-center text-sm text-gray-400 dark:text-slate-600">
               Nenhum usuário encontrado
             </div>
           )}
           {filtered.map((u) => (
             <div
               key={u.id}
-              className="grid grid-cols-[2fr_3fr_1fr_1fr_auto] px-5 py-3 gap-4 items-center hover:bg-gray-50"
+              className="grid grid-cols-[2fr_3fr_1fr_1fr_auto] px-5 py-3 gap-4 items-center group hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors"
             >
-              <span className="text-sm font-medium text-gray-800 flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-gray-900 dark:text-slate-100 flex items-center gap-1.5">
                 {u.name}
                 {u.id === currentUserId && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">você</span>
+                  <span className="text-xs bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 px-1.5 py-0.5 rounded-full">você</span>
                 )}
               </span>
-              <span className="text-sm text-gray-500 truncate">{u.email}</span>
-              <span className="text-sm text-gray-700 capitalize">{roleLabel(u.roleId)}</span>
+              <span className="text-sm text-gray-500 dark:text-slate-500 truncate">{u.email}</span>
+              <span className="text-sm text-gray-700 dark:text-slate-300 capitalize">{roleLabel(u.roleId)}</span>
               <span>
                 <span
                   className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium border ${
                     u.isActive
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-gray-50 text-gray-500 border-gray-200"
+                      ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800"
+                      : "bg-gray-50 text-gray-500 border-gray-200 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700"
                   }`}
                 >
                   {u.isActive ? "Ativo" : "Inativo"}
                 </span>
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleToggle(u)}
                   title={u.isActive ? "Desativar" : "Ativar"}
-                  className="text-gray-400 hover:text-gray-600 disabled:opacity-40"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 disabled:opacity-40"
                   disabled={isPending || u.id === currentUserId}
                 >
                   {u.isActive ? (
@@ -185,7 +185,7 @@ export default function UsersClient({ users: initial, roles, currentUserId }: Pr
                 <button
                   onClick={() => openEdit(u)}
                   title="Editar"
-                  className="text-gray-400 hover:text-blue-600"
+                  className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                   disabled={isPending}
                 >
                   <Pencil className="w-4 h-4" />
@@ -193,7 +193,7 @@ export default function UsersClient({ users: initial, roles, currentUserId }: Pr
                 <button
                   onClick={() => handleDelete(u)}
                   title="Excluir"
-                  className="text-gray-400 hover:text-red-600 disabled:opacity-40"
+                  className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-40"
                   disabled={isPending || u.id === currentUserId}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -217,16 +217,16 @@ export default function UsersClient({ users: initial, roles, currentUserId }: Pr
       {/* Confirm Delete */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">Excluir usuário?</h2>
-            <p className="text-sm text-gray-500 mb-5">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-2">Excluir usuário?</h2>
+            <p className="text-sm text-gray-500 dark:text-slate-400 mb-5">
               Tem certeza que deseja excluir{" "}
-              <strong className="text-gray-800">{confirmDelete.name}</strong>?
+              <strong className="text-gray-800 dark:text-slate-200">{confirmDelete.name}</strong>?
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
+                className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
               >
                 Cancelar
               </button>
@@ -308,39 +308,39 @@ function UserFormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mx-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-5">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl p-6 w-full max-w-md mx-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-5">
           {user ? "Editar Usuário" : "Novo Usuário"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Nome <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               E-mail <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Perfil</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Perfil</label>
             <select
               value={roleId}
               onChange={(e) => setRoleId(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -350,7 +350,7 @@ function UserFormDialog({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               {user ? "Nova Senha (deixe em branco para manter)" : "Senha *"}
             </label>
             <input
@@ -358,15 +358,15 @@ function UserFormDialog({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={user ? "••••••••" : "Mínimo 8 caracteres"}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
+              className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300"
             >
               Cancelar
             </button>

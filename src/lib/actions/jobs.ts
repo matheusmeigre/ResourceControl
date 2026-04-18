@@ -11,16 +11,40 @@ import {
 import { eq, sql, desc, and, inArray } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { hasPermission, PERMISSIONS } from "@/lib/permissions";
-import { generateId } from "@/lib/utils";
+import { generateId, STATUS_ORDER } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import type { CreateJobFormData, AppJobEntryWithApp, JobWithStats } from "@/types";
 import type { AppEntryStatus } from "@/db/schema";
 
 // ─── Job CRUD ─────────────────────────────────────────────────────────────────
 
+/**
+ * Reconciles stale IN_PROGRESS jobs whose every entry is already CONCLUIDO.
+ * Called implicitly by getJobs so no manual intervention is needed.
+ */
+async function reconcileCompletedJobs() {
+  await db
+    .update(jobs)
+    .set({ status: "COMPLETED", updatedAt: new Date().toISOString() })
+    .where(
+      and(
+        eq(jobs.status, "IN_PROGRESS"),
+        sql`(
+          SELECT COUNT(*) FROM app_job_entries WHERE job_id = ${jobs.id}
+        ) > 0`,
+        sql`(
+          SELECT COUNT(*) FROM app_job_entries
+          WHERE job_id = ${jobs.id} AND status != 'CONCLUIDO'
+        ) = 0`
+      )
+    );
+}
+
 export async function getJobs(statusFilter?: string) {
   const session = await auth();
   if (!session) throw new Error("Unauthorized");
+
+  await reconcileCompletedJobs();
 
   const rows = await db
     .select({
@@ -303,6 +327,22 @@ export async function updateEntryStatus(
     note: opts?.note || null,
   });
 
+  // Auto-complete job when all entries reach CONCLUIDO
+  if (toStatus === "CONCLUIDO") {
+    const [{ pendingCount }] = await db
+      .select({ pendingCount: sql<number>`count(*)` })
+      .from(appJobEntries)
+      .where(and(eq(appJobEntries.jobId, entry.jobId), sql`${appJobEntries.status} != 'CONCLUIDO'`));
+
+    if (Number(pendingCount) === 0) {
+      await db
+        .update(jobs)
+        .set({ status: "COMPLETED", updatedAt: new Date().toISOString() })
+        .where(and(eq(jobs.id, entry.jobId), eq(jobs.status, "IN_PROGRESS")));
+      revalidatePath("/jobs");
+    }
+  }
+
   revalidatePath(`/jobs/${entry.jobId}`);
 }
 
@@ -350,6 +390,24 @@ export async function bulkUpdateStatus(
   const jobIds = [...new Set(currentEntries.map((e) => e.jobId))];
   for (const jobId of jobIds) {
     revalidatePath(`/jobs/${jobId}`);
+  }
+
+  // Auto-complete jobs where all entries are now CONCLUIDO
+  if (toStatus === "CONCLUIDO") {
+    for (const jobId of jobIds) {
+      const [{ pendingCount }] = await db
+        .select({ pendingCount: sql<number>`count(*)` })
+        .from(appJobEntries)
+        .where(and(eq(appJobEntries.jobId, jobId), sql`${appJobEntries.status} != 'CONCLUIDO'`));
+
+      if (Number(pendingCount) === 0) {
+        await db
+          .update(jobs)
+          .set({ status: "COMPLETED", updatedAt: new Date().toISOString() })
+          .where(and(eq(jobs.id, jobId), eq(jobs.status, "IN_PROGRESS")));
+      }
+    }
+    revalidatePath("/jobs");
   }
 }
 
@@ -460,11 +518,27 @@ export async function getDashboardStats() {
 
   const recentJobs = await getJobs("IN_PROGRESS");
 
+  // App-entry count per status across all IN_PROGRESS jobs
+  const statusRows = await db
+    .select({ status: appJobEntries.status, count: sql<number>`count(*)` })
+    .from(appJobEntries)
+    .innerJoin(jobs, eq(appJobEntries.jobId, jobs.id))
+    .where(eq(jobs.status, "IN_PROGRESS"))
+    .groupBy(appJobEntries.status);
+
+  const statusBreakdown = Object.fromEntries(
+    STATUS_ORDER.map((s) => [s, 0])
+  ) as Record<AppEntryStatus, number>;
+  for (const row of statusRows) {
+    statusBreakdown[row.status as AppEntryStatus] = Number(row.count);
+  }
+
   return {
     activeJobs: activeJobsCount.count,
     appsInProgress: appsInProgress.count,
     awaitingApproval: awaitingApproval.count,
     readyForPP: readyForPP.count,
     recentJobs: recentJobs.slice(0, 5),
+    statusBreakdown,
   };
 }

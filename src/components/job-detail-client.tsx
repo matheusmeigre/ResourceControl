@@ -33,6 +33,8 @@ import {
 } from "@/lib/utils";
 import type { JobWithStats, AppJobEntryWithApp } from "@/types";
 import type { AppEntryStatus } from "@/db/schema";
+import * as Progress from "@radix-ui/react-progress";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
   LayoutList,
   Columns,
@@ -48,6 +50,9 @@ import {
   Check,
   Clock,
   Calendar,
+  ArrowRight,
+  MoreHorizontal,
+  Pencil,
 } from "lucide-react";
 
 interface Props {
@@ -206,47 +211,50 @@ export function JobDetailClient({ job, initialEntries, userPermissions }: Props)
     <div className="p-8 max-w-full">
       {/* Job Header */}
       <div className="mb-6">
-        <div className="flex items-start justify-between gap-4">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-1.5 mb-3">
+          <button
+            onClick={() => router.push("/jobs")}
+            className="text-sm text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300 transition-colors"
+          >
+            Jobs
+          </button>
+          <ChevronRight className="w-3.5 h-3.5 text-gray-300 dark:text-slate-600" />
+          <span className="text-sm text-gray-700 dark:text-slate-300 font-medium truncate max-w-xs">
+            {job.title}
+          </span>
+        </div>
+
+        <div className="flex items-start justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <button
-                onClick={() => router.push("/jobs")}
-                className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1"
-              >
-                Jobs
-                <ChevronRight className="w-3 h-3" />
-              </button>
-              <span className="text-sm text-gray-800 font-medium truncate">
-                {job.title}
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 truncate">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100 leading-tight mb-1.5">
               {job.title}
             </h1>
             {job.description && (
-              <p className="text-gray-500 mt-1 text-sm">{job.description}</p>
+              <p className="text-sm text-gray-500 dark:text-slate-400 mb-2">{job.description}</p>
             )}
             {/* Meta */}
-            <div className="flex flex-wrap items-center gap-4 mt-2">
+            <div className="flex flex-wrap items-center gap-2.5">
               {job.fromValue && job.toValue && (
-                <span className="text-sm text-gray-600">
-                  <span className="font-medium">{job.changeType}:</span>{" "}
-                  <span className="font-mono bg-red-50 text-red-600 px-1 rounded text-xs">
+                <div className="inline-flex items-center gap-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-2.5 py-1">
+                  <span className="text-xs text-gray-500 dark:text-slate-500 font-medium">{job.changeType}</span>
+                  <span className="w-px h-3.5 bg-gray-200 dark:bg-slate-700" />
+                  <span className="font-mono text-xs font-semibold bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">
                     {job.fromValue}
-                  </span>{" "}
-                  →{" "}
-                  <span className="font-mono bg-green-50 text-green-700 px-1 rounded text-xs">
+                  </span>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500 shrink-0" />
+                  <span className="font-mono text-xs font-semibold bg-green-50 dark:bg-green-950/50 text-green-600 dark:text-green-400 px-1.5 py-0.5 rounded">
                     {job.toValue}
                   </span>
-                </span>
+                </div>
               )}
               {job.targetDate && (
-                <span className="flex items-center gap-1 text-sm text-gray-500">
+                <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-slate-500">
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(job.targetDate).toLocaleDateString("pt-BR")}
                 </span>
               )}
-              <span className="flex items-center gap-1 text-sm text-gray-400">
+              <span className="flex items-center gap-1 text-sm text-gray-400 dark:text-slate-600">
                 <Clock className="w-3.5 h-3.5" />
                 por {job.createdByName}
               </span>
@@ -254,10 +262,10 @@ export function JobDetailClient({ job, initialEntries, userPermissions }: Props)
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={copyResume}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
             >
               <Copy className="w-3.5 h-3.5" />
               Resumo
@@ -265,80 +273,126 @@ export function JobDetailClient({ job, initialEntries, userPermissions }: Props)
             {canClone && (
               <button
                 onClick={() => setShowCloneDialog(true)}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <CopyIcon className="w-3.5 h-3.5" />
                 Clonar
               </button>
             )}
-            {canArchive && job.status === "IN_PROGRESS" && (
-              <button
-                onClick={handleArchive}
-                disabled={isPending}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <ArchiveIcon className="w-3.5 h-3.5" />
-                Arquivar
-              </button>
-            )}
-            {canDelete && (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 hover:text-red-700 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+            {(canArchive || canDelete) && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button className="flex items-center justify-center w-9 h-9 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                    <MoreHorizontal className="w-4 h-4" />
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    align="end"
+                    sideOffset={6}
+                    className="z-50 min-w-44 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-xl py-1 text-sm animate-in fade-in-0 zoom-in-95"
+                  >
+                    {canArchive && job.status === "IN_PROGRESS" && (
+                      <DropdownMenu.Item
+                        onClick={handleArchive}
+                        className="flex items-center gap-2.5 px-3 py-2 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer outline-none"
+                      >
+                        <ArchiveIcon className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500" />
+                        Arquivar
+                      </DropdownMenu.Item>
+                    )}
+                    {canDelete && (
+                      <>
+                        {canArchive && job.status === "IN_PROGRESS" && (
+                          <DropdownMenu.Separator className="my-1 border-t border-gray-100 dark:border-slate-700" />
+                        )}
+                        <DropdownMenu.Item
+                          onClick={() => setShowDeleteConfirm(true)}
+                          className="flex items-center gap-2.5 px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer outline-none"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Excluir Job
+                        </DropdownMenu.Item>
+                      </>
+                    )}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
             )}
           </div>
         </div>
 
-        {/* Progress + status summary */}
-        <div className="mt-4 bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              {completedApps}/{totalApps} apps concluídas ({pct}%)
-            </span>
-            <span className="text-xs text-gray-400">
-              {totalApps - completedApps} pendentes
+        {/* Progress Hero */}
+        <div className="mt-4 bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700/60 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-5">
+              <div>
+                <span className="text-3xl font-bold text-gray-900 dark:text-slate-100 tabular-nums leading-none">
+                  {pct}%
+                </span>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">{completedApps}</span>
+                  <span className="text-xs text-gray-400 dark:text-slate-500">concluídas</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-gray-300 dark:bg-slate-600 shrink-0" />
+                  <span className="text-sm font-semibold text-gray-700 dark:text-slate-300 tabular-nums">{totalApps - completedApps}</span>
+                  <span className="text-xs text-gray-400 dark:text-slate-500">pendentes</span>
+                </div>
+              </div>
+            </div>
+            <span className="text-xs text-gray-400 dark:text-slate-500 tabular-nums">
+              {completedApps}/{totalApps} apps
             </span>
           </div>
-          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-3">
-            <div
+
+          <Progress.Root
+            value={pct}
+            className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden"
+          >
+            <Progress.Indicator
               className={cn(
-                "h-full rounded-full transition-all",
-                pct === 100 ? "bg-emerald-500" : "bg-blue-500"
+                "h-full rounded-full transition-all duration-700 ease-out",
+                pct === 100
+                  ? "bg-emerald-500"
+                  : "bg-linear-to-r from-blue-600 to-blue-400"
               )}
-              style={{ width: `${pct}%` }}
+              style={{ transform: `translateX(-${100 - pct}%)` }}
             />
-          </div>
-          {/* Status counters */}
-          <div className="flex flex-wrap gap-1.5">
-            {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => (
-              <span
-                key={s}
-                className={cn(
-                  "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border",
-                  STATUS_COLORS[s]
-                )}
-              >
-                {STATUS_LABELS_PT[s]}: <strong>{counts[s]}</strong>
-              </span>
-            ))}
-          </div>
+          </Progress.Root>
+
+          {STATUS_ORDER.filter((s) => counts[s] > 0).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-100 dark:border-slate-700/50">
+              {STATUS_ORDER.filter((s) => counts[s] > 0).map((s) => (
+                <span
+                  key={s}
+                  className={cn(
+                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border",
+                    STATUS_COLORS[s]
+                  )}
+                >
+                  {STATUS_LABELS_PT[s]}: <strong>{counts[s]}</strong>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* View toggle + Bulk actions */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <div className="flex bg-gray-100 p-1 rounded-lg">
+          <div className="flex bg-gray-100 dark:bg-slate-800 p-1 rounded-lg">
             <button
               onClick={() => setView("table")}
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                 view === "table"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm"
+                  : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300"
               )}
             >
               <LayoutList className="w-4 h-4" />
@@ -349,8 +403,8 @@ export function JobDetailClient({ job, initialEntries, userPermissions }: Props)
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                 view === "kanban"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm"
+                  : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300"
               )}
             >
               <Columns className="w-4 h-4" />
@@ -489,11 +543,11 @@ function JobTable({
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
+            <tr className="border-b border-gray-100 dark:border-slate-800 bg-gray-50/80 dark:bg-slate-800/50">
               {canBulk && (
                 <th className="w-10 px-3 py-3">
                   <input
@@ -504,28 +558,28 @@ function JobTable({
                   />
                 </th>
               )}
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 Aplicação
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 Status
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 Branch
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 Sufixo
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 PR
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 HO
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 PP
               </th>
-              <th className="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">
+              <th className="text-left px-4 py-3 font-semibold text-gray-500 dark:text-slate-400 text-xs uppercase tracking-wider">
                 Notas
               </th>
               {canEdit && (
@@ -533,12 +587,12 @@ function JobTable({
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-gray-50 dark:divide-slate-800">
             {entries.length === 0 ? (
               <tr>
                 <td
                   colSpan={10}
-                  className="px-4 py-12 text-center text-gray-400"
+                  className="px-4 py-12 text-center text-gray-400 dark:text-slate-600"
                 >
                   Nenhuma aplicação neste job
                 </td>
@@ -548,8 +602,8 @@ function JobTable({
                 <tr
                   key={entry.id}
                   className={cn(
-                    "hover:bg-gray-50 transition-colors",
-                    selectedIds.has(entry.id) && "bg-blue-50 hover:bg-blue-50"
+                    "group hover:bg-gray-50/80 dark:hover:bg-slate-800/50 transition-colors",
+                    selectedIds.has(entry.id) && "bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/20"
                   )}
                 >
                   {canBulk && (
@@ -562,21 +616,24 @@ function JobTable({
                       />
                     </td>
                   )}
-                  <td className="px-4 py-3 font-medium text-gray-900">
-                    {entry.applicationName}
+                  <td className="px-4 py-3">
+                    <span className="font-semibold text-gray-900 dark:text-slate-100 text-sm">
+                      {entry.applicationName}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge
                       status={entry.status}
                       editable={canEdit}
                       onStatusChange={(s) => onStatusChange(entry.id, s)}
+                      variant="dot"
                     />
                   </td>
-                  <td className="px-4 py-3 text-gray-500 font-mono text-xs max-w-32 truncate">
-                    {entry.branchName || "—"}
+                  <td className="px-4 py-3 text-gray-500 dark:text-slate-500 font-mono text-xs max-w-32 truncate">
+                    {entry.branchName || <span className="text-gray-300 dark:text-slate-700 select-none">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 font-mono text-xs">
-                    {entry.suffixOverride || "—"}
+                  <td className="px-4 py-3 text-gray-500 dark:text-slate-500 font-mono text-xs">
+                    {entry.suffixOverride || <span className="text-gray-300 dark:text-slate-700 select-none">—</span>}
                   </td>
                   <td className="px-4 py-3">
                     {entry.prUrl ? (
@@ -584,36 +641,38 @@ function JobTable({
                         href={entry.prUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-xs"
+                        className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium"
                       >
                         PR <ExternalLink className="w-3 h-3" />
                       </a>
                     ) : (
-                      <span className="text-gray-300">—</span>
+                      <span className="text-gray-300 dark:text-slate-700 select-none">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
+                  <td className="px-4 py-3 text-gray-500 dark:text-slate-500 text-xs">
                     {entry.deployedHoAt
                       ? new Date(entry.deployedHoAt).toLocaleDateString("pt-BR")
-                      : "—"}
+                      : <span className="text-gray-300 dark:text-slate-700 select-none">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
+                  <td className="px-4 py-3 text-gray-500 dark:text-slate-500 text-xs">
                     {entry.deployedPpAt
                       ? new Date(entry.deployedPpAt).toLocaleDateString("pt-BR")
-                      : "—"}
+                      : <span className="text-gray-300 dark:text-slate-700 select-none">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs max-w-40 truncate">
-                    {entry.notes || "—"}
+                  <td className="px-4 py-3 text-gray-500 dark:text-slate-500 text-xs max-w-40 truncate">
+                    {entry.notes || <span className="text-gray-300 dark:text-slate-700 select-none">—</span>}
                   </td>
                   {canEdit && (
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => onEditEntry(entry)}
-                        className="text-gray-400 hover:text-gray-600 p-1 rounded"
-                        title="Editar dados"
-                      >
-                        <GitBranch className="w-4 h-4" />
-                      </button>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => onEditEntry(entry)}
+                          className="p-1.5 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded-md hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                          title="Editar dados"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -704,7 +763,7 @@ function KanbanColumn({
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
   return (
-    <div className="w-52 flex-shrink-0">
+    <div className="w-52 shrink-0">
       {/* Column header */}
       <div
         className={cn(
@@ -857,7 +916,7 @@ function BulkActionsBar({
                 >
                   <span
                     className={cn(
-                      "w-2 h-2 rounded-full flex-shrink-0",
+                      "w-2 h-2 rounded-full shrink-0",
                       STATUS_COLORS[s].split(" ")[0]
                     )}
                   />
@@ -907,17 +966,17 @@ function EditEntryDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">{entry.applicationName}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <h3 className="font-semibold text-gray-900 dark:text-slate-100">{entry.applicationName}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Branch
             </label>
             <input
@@ -925,12 +984,12 @@ function EditEntryDialog({
               value={branchName}
               onChange={(e) => setBranchName(e.target.value)}
               placeholder="Ex: release/alteracao_repo4"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Sufixo Especial
             </label>
             <input
@@ -938,12 +997,12 @@ function EditEntryDialog({
               value={suffixOverride}
               onChange={(e) => setSuffixOverride(e.target.value)}
               placeholder="Ex: -repo3-cache"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 text-sm font-mono outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               URL do PR
             </label>
             <input
@@ -951,12 +1010,12 @@ function EditEntryDialog({
               value={prUrl}
               onChange={(e) => setPrUrl(e.target.value)}
               placeholder="https://github.com/..."
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-slate-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Notas / Caso Especial
             </label>
             <textarea
@@ -964,7 +1023,7 @@ function EditEntryDialog({
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               placeholder="Ex: MSANXC — mudar -repo3 para -repo4 (caso diferente)"
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-blue-500 resize-none placeholder:text-gray-400 dark:placeholder:text-slate-500"
             />
           </div>
         </div>
@@ -1012,18 +1071,18 @@ function SimpleDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">{title}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <h3 className="font-semibold text-gray-900 dark:text-slate-100">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="mb-5">{children}</div>
+        <div className="mb-5 text-gray-600 dark:text-slate-400">{children}</div>
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-2 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50"
+            className="flex-1 py-2 text-sm text-gray-600 dark:text-slate-400 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800"
           >
             Cancelar
           </button>

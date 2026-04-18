@@ -14,9 +14,9 @@ const STATUS_FILTER_LABELS: Record<string, string> = {
 };
 
 const JOB_STATUS_BADGES: Record<JobStatus, string> = {
-  IN_PROGRESS: "bg-blue-100 text-blue-700",
-  COMPLETED: "bg-emerald-100 text-emerald-700",
-  CANCELLED: "bg-gray-100 text-gray-500",
+  IN_PROGRESS: "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400",
+  COMPLETED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  CANCELLED: "bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400",
 };
 
 const JOB_STATUS_LABELS: Record<JobStatus, string> = {
@@ -39,8 +39,8 @@ export default async function JobsPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Jobs</h1>
-          <p className="text-gray-500 mt-1">Lotes de ajuste de recurso</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Jobs</h1>
+          <p className="text-gray-500 dark:text-slate-400 mt-1">Lotes de ajuste de recurso</p>
         </div>
         <Link
           href="/jobs/new"
@@ -52,7 +52,7 @@ export default async function JobsPage({
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-lg w-fit mb-6">
+      <div className="flex gap-1 bg-gray-100 dark:bg-slate-800 p-1 rounded-lg w-fit mb-6">
         {Object.entries(STATUS_FILTER_LABELS).map(([value, label]) => (
           <Link
             key={value}
@@ -60,8 +60,8 @@ export default async function JobsPage({
             className={cn(
               "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
               filter === value
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 shadow-sm"
+                : "text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
             )}
           >
             {label}
@@ -71,12 +71,12 @@ export default async function JobsPage({
 
       {/* Jobs grid */}
       {jobs.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center">
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ChevronDown className="w-6 h-6 text-gray-400" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-16 text-center">
+          <div className="w-12 h-12 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ChevronDown className="w-6 h-6 text-gray-400 dark:text-slate-500" />
           </div>
-          <p className="text-gray-500 font-medium">Nenhum job encontrado</p>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-500 dark:text-slate-400 font-medium">Nenhum job encontrado</p>
+          <p className="text-gray-400 dark:text-slate-500 text-sm mt-1">
             {filter === "IN_PROGRESS"
               ? "Crie um novo job para começar"
               : "Não há jobs com este status"}
@@ -84,7 +84,7 @@ export default async function JobsPage({
           {filter === "IN_PROGRESS" && (
             <Link
               href="/jobs/new"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="mt-4 inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
             >
               <Plus className="w-4 h-4" />
               Criar novo job
@@ -103,39 +103,39 @@ export default async function JobsPage({
               <Link
                 key={job.id}
                 href={`/jobs/${job.id}`}
-                className="bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all group"
+                className="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 p-5 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm transition-all group"
               >
                 {/* Status + title */}
                 <div className="flex items-start gap-3 mb-3">
                   <span
                     className={cn(
-                      "inline-flex px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5",
+                      "inline-flex px-2 py-0.5 rounded-full text-xs font-medium shrink-0 mt-0.5",
                       JOB_STATUS_BADGES[job.status]
                     )}
                   >
                     {JOB_STATUS_LABELS[job.status]}
                   </span>
-                  <h3 className="font-semibold text-gray-900 leading-snug flex-1 group-hover:text-blue-700 transition-colors">
+                  <h3 className="font-semibold text-gray-900 dark:text-slate-100 leading-snug flex-1 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">
                     {job.title}
                   </h3>
                 </div>
 
                 {/* Change info */}
                 {job.fromValue && job.toValue && (
-                  <p className="text-sm text-gray-500 mb-1">
-                    <span className="font-medium text-gray-700">{job.changeType}:</span>{" "}
-                    <span className="font-mono bg-red-50 text-red-600 px-1 rounded">
+                  <p className="text-sm text-gray-500 dark:text-slate-400 mb-1">
+                    <span className="font-medium text-gray-700 dark:text-slate-300">{job.changeType}:</span>{" "}
+                    <span className="font-mono bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 px-1 rounded">
                       {job.fromValue}
                     </span>{" "}
                     →{" "}
-                    <span className="font-mono bg-green-50 text-green-700 px-1 rounded">
+                    <span className="font-mono bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 px-1 rounded">
                       {job.toValue}
                     </span>
                   </p>
                 )}
 
                 {/* Meta */}
-                <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
+                <div className="flex items-center gap-4 text-xs text-gray-400 dark:text-slate-500 mb-4">
                   <span>por {job.createdByName}</span>
                   {job.targetDate && (
                     <span className="flex items-center gap-1">
@@ -147,13 +147,13 @@ export default async function JobsPage({
 
                 {/* Progress */}
                 <div>
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                  <div className="flex items-center justify-between text-xs text-gray-400 dark:text-slate-500 mb-1">
                     <span>Progresso</span>
                     <span>
                       {job.completedApps}/{job.totalApps} apps ({pct}%)
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-100 dark:bg-slate-700/60 rounded-full overflow-hidden">
                     <div
                       className={cn(
                         "h-full rounded-full transition-all",
@@ -166,7 +166,7 @@ export default async function JobsPage({
 
                 {/* Arrow */}
                 <div className="flex justify-end mt-3">
-                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-gray-300 dark:text-slate-600 group-hover:text-blue-400 transition-colors" />
                 </div>
               </Link>
             );

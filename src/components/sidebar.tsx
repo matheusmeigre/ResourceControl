@@ -36,98 +36,100 @@ export function Sidebar() {
     return pathname.startsWith(href);
   }
 
+  const navLink = (active: boolean) =>
+    cn(
+      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200",
+      active
+        ? "bg-blue-500/10 text-blue-400 font-medium"
+        : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+    );
+
   return (
-    <aside className="w-64 min-h-screen bg-gray-900 text-white flex flex-col">
+    <aside className="w-64 min-h-screen bg-slate-900 text-white flex flex-col border-r border-slate-800/60">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-800">
-        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-slate-800/60">
+        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shrink-0 shadow-lg shadow-blue-900/50">
           <Settings2 className="w-4 h-4 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-semibold leading-tight truncate">Controle de</p>
-          <p className="text-xs text-gray-400 leading-tight truncate">Ajuste de Recurso</p>
+          <p className="text-sm font-semibold leading-tight text-slate-100 truncate">Controle de</p>
+          <p className="text-[11px] text-slate-500 leading-tight truncate">Ajuste de Recurso</p>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-              isActive(item.href)
-                ? "bg-blue-600 text-white"
-                : "text-gray-400 hover:text-white hover:bg-gray-800"
-            )}
-          >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            {item.label}
-            {isActive(item.href) && (
-              <ChevronRight className="w-3 h-3 ml-auto" />
-            )}
-          </Link>
-        ))}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <div key={item.href} className="relative">
+              {active && (
+                <span className="absolute -left-3 top-1.75 bottom-1.75 w-0.75 bg-blue-500 rounded-r-full" />
+              )}
+              <Link href={item.href} className={navLink(active)}>
+                <item.icon className="w-4 h-4 shrink-0" />
+                {item.label}
+                {active && <ChevronRight className="w-3 h-3 ml-auto opacity-50" />}
+              </Link>
+            </div>
+          );
+        })}
 
         {isAdmin && (
           <>
-            <div className="pt-4 pb-1">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3">
+            <div className="pt-5 pb-1.5 px-3">
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">
                 Administração
               </p>
             </div>
-            {adminItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-                  isActive(item.href)
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800"
-                )}
-              >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                {item.label}
-                {isActive(item.href) && (
-                  <ChevronRight className="w-3 h-3 ml-auto" />
-                )}
-              </Link>
-            ))}
+            {adminItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <div key={item.href} className="relative">
+                  {active && (
+                    <span className="absolute -left-3 top-1.75 bottom-1.75 w-0.75 bg-blue-500 rounded-r-full" />
+                  )}
+                  <Link href={item.href} className={navLink(active)}>
+                    <item.icon className="w-4 h-4 shrink-0" />
+                    {item.label}
+                    {active && <ChevronRight className="w-3 h-3 ml-auto opacity-50" />}
+                  </Link>
+                </div>
+              );
+            })}
           </>
         )}
       </nav>
 
       {/* Theme Toggle */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-slate-800/60">
         <ThemeToggle />
       </div>
 
       {/* User */}
-      <div className="px-3 py-4 border-t border-gray-800">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-semibold text-white">
+      <div className="px-3 pb-3 pt-2 border-t border-slate-800/60">
+        <div className="flex items-center gap-3 px-2 py-2 rounded-lg group hover:bg-white/5 transition-colors">
+          <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center shrink-0 ring-2 ring-blue-500/20">
+            <span className="text-xs font-bold text-white">
               {session?.user?.name?.charAt(0)?.toUpperCase() ?? "U"}
             </span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-white truncate">
+            <p className="text-sm font-medium text-slate-200 truncate leading-tight">
               {session?.user?.name}
             </p>
-            <p className="text-xs text-gray-400 truncate capitalize">
+            <p className="text-[11px] text-slate-500 truncate capitalize leading-tight">
               {session?.user?.roleName}
             </p>
           </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title="Sair"
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md hover:bg-white/10 text-slate-400 hover:text-red-400"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
         </div>
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-gray-800 w-full transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          Sair
-        </button>
       </div>
     </aside>
   );

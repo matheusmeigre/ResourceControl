@@ -68,15 +68,15 @@ export const STATUS_LABELS_EN: Record<AppEntryStatus, string> = {
  * Status color CSS classes (Tailwind) — badge colors.
  */
 export const STATUS_COLORS: Record<AppEntryStatus, string> = {
-  PENDENTE: "bg-gray-100 text-gray-700 border-gray-200",
-  BRANCH_CRIADA: "bg-blue-100 text-blue-700 border-blue-200",
-  YML_EDITADO: "bg-indigo-100 text-indigo-700 border-indigo-200",
-  PR_ABERTO: "bg-orange-100 text-orange-700 border-orange-200",
-  AGUARDANDO_APROVACAO: "bg-yellow-100 text-yellow-700 border-yellow-200",
-  PR_APROVADO: "bg-lime-100 text-lime-700 border-lime-200",
-  DEPLOY_HO: "bg-purple-100 text-purple-700 border-purple-200",
-  DEPLOY_PP: "bg-green-100 text-green-700 border-green-200",
-  CONCLUIDO: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  PENDENTE:             "bg-gray-100   text-gray-700   border-gray-200   dark:bg-slate-800       dark:text-slate-300  dark:border-slate-700",
+  BRANCH_CRIADA:        "bg-blue-100   text-blue-700   border-blue-200   dark:bg-blue-950/40     dark:text-blue-400   dark:border-blue-800",
+  YML_EDITADO:          "bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40   dark:text-indigo-400 dark:border-indigo-800",
+  PR_ABERTO:            "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950/40   dark:text-orange-400 dark:border-orange-800",
+  AGUARDANDO_APROVACAO: "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40   dark:text-yellow-400 dark:border-yellow-800",
+  PR_APROVADO:          "bg-lime-100   text-lime-700   border-lime-200   dark:bg-lime-950/40     dark:text-lime-400   dark:border-lime-800",
+  DEPLOY_HO:            "bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950/40   dark:text-purple-400 dark:border-purple-800",
+  DEPLOY_PP:            "bg-green-100  text-green-700  border-green-200  dark:bg-green-950/40    dark:text-green-400  dark:border-green-800",
+  CONCLUIDO:            "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800",
 };
 
 /**
